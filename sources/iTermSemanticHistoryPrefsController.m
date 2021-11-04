@@ -34,6 +34,7 @@ NSString *kVSCodiumIdentifier = @"com.visualstudio.code.oss";
 NSString *kVSCodeInsidersIdentifier = @"com.microsoft.VSCodeInsiders";
 NSString *kEmacsAppIdentifier = @"org.gnu.Emacs";
 NSString *kIntelliJIDEAIdentifier = @"com.jetbrains.intellij.ce";
+NSString *kIntelliJPyCharmIdentifier = @"com.jetbrains.pycharm";
 
 NSString *kSemanticHistoryBestEditorAction = @"best editor";
 NSString *kSemanticHistoryUrlAction = @"url";

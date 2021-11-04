@@ -212,6 +212,11 @@ NSString *const kSemanticHistoryColumnNumberKey = @"semanticHistory.columnNumber
     return [[[[bundle.bundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"MacOS"] URLByAppendingPathComponent:@"idea"] path];
 }
 
+- (NSString *)intelliJPyCharmLauncherInApplicationBundle:(NSBundle *)bundle {
+    DLog(@"Trying to find IntelliJ PyCharm launcher in %@", bundle.bundlePath);
+    return [[[[bundle.bundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"MacOS"] URLByAppendingPathComponent:@"pycharm"] path];
+}
+
 - (void)launchAppWithBundleIdentifier:(NSString *)bundleIdentifier args:(NSArray *)args {
     NSBundle *bundle = [self applicationBundleWithIdentifier:bundleIdentifier];
     if (!bundle) {
@@ -307,6 +312,27 @@ NSString *const kSemanticHistoryColumnNumberKey = @"semanticHistory.columnNumber
                   completion:nil];
 }
 
+- (void)launchIntelliJPyCharmWithArguments:(NSArray<NSString *> *)args path:(NSString *)path {
+    NSBundle *bundle = [self applicationBundleWithIdentifier:kIntelliJPyCharmIdentifier];
+    if (!bundle) {
+        DLog(@"Failed to find PyCharm bundle");
+        return;
+    }
+    NSString *launcher = [self intelliJPyCharmLauncherInApplicationBundle:bundle];
+    if (!launcher) {
+        DLog(@"Failed to find launcher in %@", bundle);
+        if (path) {
+            DLog(@"Launch PyCharm with path %@", path);
+            [self launchAppWithBundleIdentifier:kIntelliJPyCharmIdentifier
+                                           path:path];
+        }
+        return;
+    }
+    [self launchTaskWithPath:launcher
+                   arguments:args
+                  completion:nil];
+}
+
 - (NSString *)absolutePathForAppBundleWithIdentifier:(NSString *)bundleId {
     return [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:bundleId];
 }
@@ -345,6 +371,7 @@ NSString *const kSemanticHistoryColumnNumberKey = @"semanticHistory.columnNumber
               kTextmate2Identifier,
               kBBEditIdentifier,
               kEmacsAppIdentifier,
+              kIntelliJPyCharmIdentifier,
               kIntelliJIDEAIdentifier ];
 }
 
@@ -424,6 +451,18 @@ NSString *const kSemanticHistoryColumnNumberKey = @"semanticHistory.columnNumber
             }
         }
         [self launchIntelliJIDEAWithArguments:args path:path];
+        return;
+    }
+    if ([identifier isEqualToString:kIntelliJPyCharmIdentifier]) {
+        NSArray<NSString *> *args = @[];
+        if (path) {
+            if (lineNumber) {
+                args = @[ @"--line", lineNumber, path ];
+            } else {
+                args = @[ path ];
+            }
+        }
+        [self launchIntelliJPyCharmWithArguments:args path:path];
         return;
     }
 
